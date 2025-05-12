@@ -1,91 +1,52 @@
-name: Simple Auto Test
+ذا احسن منه ؟ name: Run PHP & JS Tests
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+on: [push, pull_request]
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout the repository
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. Simulate a functional test
-      - name: Simulate Functional Test
-        run: |
-          echo "Running functional test..."
-          if [ -f index.html ]; then
-            echo "index.html found ✅"
-          else
-            echo "index.html not found ❌"
-            exit 1
-          fi
+      # إعداد PHP
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
 
-      # 3. Simulate a non-functional test
-      - name: Simulate Non-Functional Test
-        run: |
-          echo "Running non-functional test..."
-          echo "Code looks clean and well-structured!"
-          
-          # Example: Check for specific file (main.js)
-          if [ -f main.js ]; then
-            echo "main.js found ✅"
-          else
-            echo "main.js not found ❌"
-            exit 1
-          fi
+      - name: Install PHP dependencies
+        run: composer install
 
-      # 4. Generate a realistic-looking test report
-      - name: Generate Test Report
+      - name: Run PHP tests
         run: |
-          echo "# Automated Test Report" > automated-test-report.md
-          echo "" >> automated-test-report.md
-          echo "> Generated automatically by GitHub Actions on \`main\` branch." >> automated-test-report.md
-          echo "" >> automated-test-report.md
-          echo "## ✅ Functional Tests" >> automated-test-report.md
-          echo "- index.html: **Found**" >> automated-test-report.md
-          echo "- main.js: **Found**" >> automated-test-report.md
-          echo "- styles.css: **Found**" >> automated-test-report.md
-          echo "- Navigation functionality: **Passed**" >> automated-test-report.md
-          echo "- Contact form validation: **Passed**" >> automated-test-report.md
-          echo "" >> automated-test-report.md
-          echo "## ✅ Non-Functional Tests" >> automated-test-report.md
-          echo "### Performance" >> automated-test-report.md
-          echo "- Page Load Time: **1.8s**" >> automated-test-report.md
-          echo "- Performance Score: **92/100**" >> automated-test-report.md
-          echo "" >> automated-test-report.md
-          echo "### Accessibility" >> automated-test-report.md
-          echo "- Contrast Ratio: **Compliant**" >> automated-test-report.md
-          echo "- Keyboard Navigation: **Passed**" >> automated-test-report.md
-          echo "- Accessibility Score: **88/100**" >> automated-test-report.md
-          echo "" >> automated-test-report.md
-          echo "### Best Practices" >> automated-test-report.md
-          echo "- No console errors" >> automated-test-report.md
-          echo "- HTTPS enforced" >> automated-test-report.md
-          echo "- Best Practices Score: **95/100**" >> automated-test-report.md
-          echo "" >> automated-test-report.md
-          echo "### SEO" >> automated-test-report.md
-          echo "- Meta tags present" >> automated-test-report.md
-          echo "- Sitemap detected" >> automated-test-report.md
-          echo "- SEO Score: **97/100**" >> automated-test-report.md
-          echo "" >> automated-test-report.md
-          echo "## Summary" >> automated-test-report.md
-          echo "" >> automated-test-report.md
-          echo "| Test Type         | Status     | Notes                        |" >> automated-test-report.md
-          echo "|------------------|------------|------------------------------|" >> automated-test-report.md
-          echo "| Functional        | ✅ Passed  | All critical functions passed |" >> automated-test-report.md
-          echo "| Non-Functional    | ✅ Passed  | Scores within acceptable range |" >> automated-test-report.md
-          echo "" >> automated-test-report.md
-          echo "> All tests completed successfully. No critical issues detected." >> automated-test-report.md
+          ./vendor/bin/phpunit --log-junit phpunit-report.xml
 
-      # 5. Ensure the file exists and then upload the test report
-      - name: Upload Test Report
+      # إعداد Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install JS dependencies
+        run: npm install
+
+      - name: Run JS tests
         run: |
-          if [ -f automated-test-report.md ]; then
-            echo "Uploading test report..."
-            mv automated-test-report.md $GITHUB_WORKSPACE/
+          npm test -- --ci --reporters=default --reporters=jest-junit
+        env:
+          JEST_JUNIT_OUTPUT: jest-report.xml
+
+      # رفع تقارير الاختبار
+      - name: Upload PHP report
+        uses: actions/upload-artifact@v3
+        with:
+          name: phpunit-report
+          path: phpunit-report.xml
+
+      - name: Upload JS report
+        uses: actions/upload-artifact@v3
+        with:
+          name: jest-report
+          path: jest-report.xml

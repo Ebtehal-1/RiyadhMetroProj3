@@ -1,4 +1,4 @@
-ذا احسن منه ؟ name: Run PHP & JS Tests
+name: Run PHP & JS Tests
 
 on: [push, pull_request]
 

@@ -85,8 +85,7 @@ jobs:
 
       # 5. Ensure the file exists and then upload the test report
       - name: Upload Test Report
-        if: exists(automated-test-report.md)
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-report
-          path: automated-test-report.md
+        run: |
+          if [ -f automated-test-report.md ]; then
+            echo "Uploading test report..."
+            mv automated-test-report.md $GITHUB_WORKSPACE/

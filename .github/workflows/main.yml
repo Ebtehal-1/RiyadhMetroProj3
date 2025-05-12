@@ -31,6 +31,14 @@ jobs:
         run: |
           echo "Running non-functional test..."
           echo "Code looks clean and well-structured!"
+          
+          # Example: Check for specific file (main.js)
+          if [ -f main.js ]; then
+            echo "main.js found ✅"
+          else
+            echo "main.js not found ❌"
+            exit 1
+          fi
 
       # 4. Generate a realistic-looking test report
       - name: Generate Test Report
@@ -75,8 +83,9 @@ jobs:
           echo "" >> automated-test-report.md
           echo "> All tests completed successfully. No critical issues detected." >> automated-test-report.md
 
-      # 5. Upload the test report as an artifact
+      # 5. Ensure the file exists and then upload the test report
       - name: Upload Test Report
+        if: exists(automated-test-report.md)
         uses: actions/upload-artifact@v3
         with:
           name: test-report

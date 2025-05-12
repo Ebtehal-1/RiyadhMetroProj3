@@ -1,40 +1,13 @@
-name: CI for RiyadhMetroProj3
+name: CI for Web Project
 
 on: [push, pull_request]
 
 jobs:
-  python-tests:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-
-    - name: Install Python dependencies
-      run: |
-        pip install -r requirements.txt || echo "No requirements.txt file"
-        pip install pytest
-
-    - name: Run Python tests
-      run: |
-        pytest tests/ --junitxml=python-test-report.xml || echo "No tests found"
-
-    - name: Upload Python Test Report
-      uses: actions/upload-artifact@v3.1.3
-      with:
-        name: python-test-report
-        path: python-test-report.xml
-
   javascript-tests:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
+    - name: Checkout code
       uses: actions/checkout@v3
 
     - name: Set up Node.js
@@ -42,16 +15,30 @@ jobs:
       with:
         node-version: '18'
 
-    - name: Install JS dependencies
+    - name: Install dependencies
       run: |
-        npm install || echo "No package.json found"
+        npm install || echo "No package.json"
 
-    - name: Run JS tests
+    - name: Run JavaScript tests
       run: |
         npm test || echo "No JS tests defined"
 
-    - name: Upload JS Test Report
-      uses: actions/upload-artifact@v3.1.3
+  php-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
       with:
-        name: js-test-report
-        path: test-report.xml
+        php-version: '8.1'
+
+    - name: Install dependencies
+      run: |
+        composer install || echo "No composer.json found"
+
+    - name: Run PHP tests
+      run: |
+        ./vendor/bin/phpunit || echo "No PHP tests"

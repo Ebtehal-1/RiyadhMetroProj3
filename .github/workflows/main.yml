@@ -38,15 +38,15 @@ jobs:
         env:
           JEST_JUNIT_OUTPUT: jest-report.xml
 
-      # رفع تقارير الاختبار
+      # رفع تقارير الاختبار (باستخدام النسخة v4)
       - name: Upload PHP report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: phpunit-report
           path: phpunit-report.xml
 
       - name: Upload JS report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: jest-report
           path: jest-report.xml

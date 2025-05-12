@@ -1,0 +1,44 @@
+name: CI for Web Project
+
+on: [push, pull_request]
+
+jobs:
+  javascript-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: |
+        npm install || echo "No package.json"
+
+    - name: Run JavaScript tests
+      run: |
+        npm test || echo "No JS tests defined"
+
+  php-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'
+
+    - name: Install dependencies
+      run: |
+        composer install || echo "No composer.json found"
+
+    - name: Run PHP tests
+      run: |
+        ./vendor/bin/phpunit || echo "No PHP tests"

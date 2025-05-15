@@ -1,44 +1,27 @@
-name: CI for Web Project
+name: PHP Automated Tests
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-  javascript-tests:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'  # اختاري إصدار PHP المناسب لمشروعك
+        extensions: mbstring, xml, curl  # اضافة الإضافات المطلوبة إذا لزم الأمر
 
-      - name: Install dependencies
-        run: |
-          if [ -f package.json ]; then npm install; else echo "No package.json"; fi
+    - name: Install dependencies
+      run: composer install --no-progress --no-suggest --prefer-dist
 
-      - name: Run JavaScript tests
-        run: |
-          if [ -f package.json ]; then npm test || echo "JS tests failed or not defined"; else echo "No JS tests defined"; fi
-
-  php-tests:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.1'
-
-      - name: Install dependencies
-        run: |
-          if [ -f composer.json ]; then composer install; else echo "No composer.json found"; fi
-
-      - name: Run PHP tests
-        run: |
-          if [ -f ./vendor/bin/phpunit ]; then ./vendor/bin/phpunit || echo "PHP tests failed"; else echo "No PHP tests found"; fi
+    - name: Run PHPUnit tests
+      run: ./vendor/bin/phpunit --log-junit test-results.xml
